@@ -1,0 +1,20 @@
+{
+  "name": "agent-worker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "tsx run.ts",
+    "faucet": "tsx faucet-once.ts"
+  },
+  "dependencies": {
+    "@pulse/core": "*",
+    "@somnia-chain/markets-sdk": "0.29.0",
+    "viem": "^2.21.54",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.4.5"
+  }
+}
+
