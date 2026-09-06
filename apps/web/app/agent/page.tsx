@@ -89,23 +89,39 @@ export default function AgentPage() {
         <div className="lg:col-span-1 bg-[#080d1e] border border-slate-800 rounded-xl p-5">
           <div className="flex items-center justify-between pb-3 border-b border-slate-800">
             <span className="text-xs font-mono uppercase text-slate-400">Current Window</span>
-            <span className="text-xs font-mono text-emerald-400">Trading (Status: 1)</span>
+            <span className="text-xs font-mono text-emerald-400">
+              {telemetry?.activeMarket?.status === 1 ? "Trading (Status: 1)" : "Active Window"}
+            </span>
           </div>
 
           <div className="my-4">
-            <div className="text-lg font-bold text-white">BTC-15M-UPDOWN</div>
-            <div className="text-xs text-slate-500 font-mono mt-0.5">Expiry in: ~07m 45s</div>
+            <div className="text-lg font-bold text-white truncate" title={telemetry?.activeMarket?.symbol || "BTC-15M-UPDOWN"}>
+              {telemetry?.activeMarket?.symbol || telemetry?.activeMarketSymbol || "BTC-15M-UPDOWN"}
+            </div>
+            <div className="text-xs text-slate-500 font-mono mt-0.5">
+              {telemetry?.activeMarket?.secondsLeft !== undefined
+                ? `Expiry in: ~${Math.floor(telemetry.activeMarket.secondsLeft / 60)}m ${telemetry.activeMarket.secondsLeft % 60}s`
+                : "Expiry in: ~07m 45s"}
+            </div>
           </div>
 
           <div className="space-y-3 font-mono text-xs">
             <div className="p-3 rounded-lg bg-slate-900/60 border border-slate-800">
               <div className="flex justify-between text-slate-400 mb-1">
                 <span>Fair Value P(Up):</span>
-                <span className="text-blue-400 font-bold">59.2%</span>
+                <span className="text-blue-400 font-bold">
+                  {telemetry?.activeMarket?.fairUp !== undefined
+                    ? `${(telemetry.activeMarket.fairUp * 100).toFixed(1)}%`
+                    : "59.2%"}
+                </span>
               </div>
               <div className="flex justify-between text-slate-400 mb-1">
                 <span>EWMA Realized Vol:</span>
-                <span className="text-slate-200">44.1%</span>
+                <span className="text-slate-200">
+                  {telemetry?.activeMarket?.volatility !== undefined
+                    ? `${(telemetry.activeMarket.volatility * 100).toFixed(1)}%`
+                    : "44.1%"}
+                </span>
               </div>
               <div className="flex justify-between text-slate-400">
                 <span>Pair-Mint Margin:</span>
@@ -119,11 +135,19 @@ export default function AgentPage() {
               </div>
               <div className="flex justify-between items-center py-1 px-2 rounded bg-emerald-950/40 border border-emerald-900/40 text-emerald-300">
                 <span>BID UP:</span>
-                <span className="font-bold">$0.572 (5 tUSDC)</span>
+                <span className="font-bold">
+                  {telemetry?.activeMarket?.bidUpPrice !== undefined
+                    ? `$${telemetry.activeMarket.bidUpPrice.toFixed(3)} (5 tUSDC)`
+                    : "$0.572 (5 tUSDC)"}
+                </span>
               </div>
               <div className="flex justify-between items-center py-1 px-2 rounded bg-blue-950/40 border border-blue-900/40 text-blue-300 mt-1.5">
                 <span>BID DOWN:</span>
-                <span className="font-bold">$0.388 (5 tUSDC)</span>
+                <span className="font-bold">
+                  {telemetry?.activeMarket?.bidDownPrice !== undefined
+                    ? `$${telemetry.activeMarket.bidDownPrice.toFixed(3)} (5 tUSDC)`
+                    : "$0.388 (5 tUSDC)"}
+                </span>
               </div>
             </div>
           </div>
@@ -187,14 +211,25 @@ export default function AgentPage() {
                       )}
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <a
-                        href="https://shannon-explorer.somnia.network"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-slate-500 hover:text-blue-400 inline-flex items-center gap-1"
-                      >
-                        0x{p.marketId.slice(2, 10)}... <ExternalLink className="w-3 h-3" />
-                      </a>
+                      {p.txHash ? (
+                        <a
+                          href={`https://shannon-explorer.somnia.network/tx/${p.txHash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1 font-bold"
+                        >
+                          {p.txHash.slice(0, 8)}...{p.txHash.slice(-6)} <ExternalLink className="w-3 h-3" />
+                        </a>
+                      ) : (
+                        <a
+                          href="https://shannon-explorer.somnia.network"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-slate-500 hover:text-blue-400 inline-flex items-center gap-1"
+                        >
+                          0x{p.marketId.slice(2, 10)}... <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
                     </td>
                   </tr>
                 );

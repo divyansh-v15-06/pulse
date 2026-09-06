@@ -11,7 +11,8 @@
     "dev:web": "npm run dev --workspace=apps/web",
     "build:web": "npm run build --workspace=apps/web",
     "agent": "tsx agent-worker/run.ts",
-    "agent:faucet": "tsx agent-worker/faucet-once.ts"
+    "agent:faucet": "tsx agent-worker/faucet-once.ts",
+    "deploy:contract": "npm run deploy --workspace=@pulse/contracts"
   },
   "devDependencies": {
     "typescript": "^5.4.5",

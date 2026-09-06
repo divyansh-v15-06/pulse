@@ -1,4 +1,6 @@
-import { PredictionRecord, getCalibrationStats } from "@pulse/core";
+import fs from "fs";
+import path from "path";
+import { PredictionRecord, getCalibrationStats, ActiveMarketView } from "@pulse/core";
 
 export interface TelemetryState {
   isQuotingActive: boolean;
@@ -10,6 +12,7 @@ export interface TelemetryState {
   lastQuoteTimestamp?: number;
   brierScore: number;
   unhedgedLegsCount: number;
+  activeMarket?: ActiveMarketView;
   recentOrders: Array<{
     symbol: string;
     outcome: "UP" | "DOWN";
@@ -51,7 +54,36 @@ if (!global.__pulsePredictions) {
   ];
 }
 
+function readDiskTelemetry(): any | null {
+  const possiblePaths = [
+    path.resolve(process.cwd(), ".pulse-telemetry.json"),
+    path.resolve(process.cwd(), "../../.pulse-telemetry.json"),
+    path.resolve("/Users/shlok/pulse", ".pulse-telemetry.json"),
+  ];
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      try {
+        const raw = fs.readFileSync(p, "utf-8");
+        return JSON.parse(raw);
+      } catch {
+        // Fallback
+      }
+    }
+  }
+  return null;
+}
+
 export function getTelemetry(): TelemetryState {
+  const disk = readDiskTelemetry();
+  if (disk) {
+    global.__pulseTelemetry = {
+      ...global.__pulseTelemetry!,
+      ...disk,
+    };
+    if (Array.isArray(disk.predictions) && disk.predictions.length > 0) {
+      global.__pulsePredictions = disk.predictions;
+    }
+  }
   return global.__pulseTelemetry!;
 }
 
@@ -63,6 +95,10 @@ export function updateTelemetry(patch: Partial<TelemetryState>): void {
 }
 
 export function getPredictions(): PredictionRecord[] {
+  const disk = readDiskTelemetry();
+  if (disk && Array.isArray(disk.predictions) && disk.predictions.length > 0) {
+    global.__pulsePredictions = disk.predictions;
+  }
   return global.__pulsePredictions!;
 }
 
@@ -75,4 +111,5 @@ export function recordPrediction(pred: PredictionRecord): void {
     lastQuoteTimestamp: Date.now(),
   });
 }
+
 

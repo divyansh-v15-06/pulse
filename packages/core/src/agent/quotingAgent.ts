@@ -1,5 +1,5 @@
 import { unwrapReceipt } from "../client";
-import { FairValueModel, MidFollowingModel, BlackScholesBinaryModel, PriceCandle } from "./fairValueModel";
+import { FairValueModel, MidFollowingModel, BlackScholesBinaryModel, PriceCandle, calculateEWMAVolatility } from "./fairValueModel";
 import { PredictionRecord, computeBrierScore, computeDynamicSpreadMultiplier } from "../analytics/calibration";
 import { recordDecisionOnChain, OnChainAuditInput } from "./audit";
 
@@ -26,6 +26,20 @@ export interface QuotingOrderResult {
   error?: string;
 }
 
+export interface ActiveMarketView {
+  marketId: string;
+  symbol: string;
+  expiry: number;
+  secondsLeft: number;
+  fairUp: number;
+  volatility: number;
+  strikePrice?: number;
+  spotPrice?: number;
+  bidUpPrice: number;
+  bidDownPrice: number;
+  status: number;
+}
+
 export interface QuotingPassSummary {
   timestamp: number;
   marketsScanned: number;
@@ -36,6 +50,7 @@ export interface QuotingPassSummary {
   activeModel: string;
   brierScore: number;
   effectiveSpread: number;
+  activeMarket?: ActiveMarketView;
 }
 
 export interface MarketInventoryState {
@@ -231,6 +246,22 @@ export class PulseQuotingAgent {
 
           const bidUpPrice = Number(Math.max(0.01, Math.min(0.99, fairUp - upSpread)).toFixed(3));
           const bidDownPrice = Number(Math.max(0.01, Math.min(0.99, (1 - fairUp) - downSpread)).toFixed(3));
+
+          if (!summary.activeMarket) {
+            summary.activeMarket = {
+              marketId,
+              symbol: market.symbol || "BTC-15M-UPDOWN",
+              expiry,
+              secondsLeft,
+              fairUp,
+              volatility: candles.length > 0 ? calculateEWMAVolatility(candles) : 0.441,
+              strikePrice: candles.length > 0 ? candles[0].open : undefined,
+              spotPrice: candles.length > 0 ? candles[candles.length - 1].close : undefined,
+              bidUpPrice,
+              bidDownPrice,
+              status: 1,
+            };
+          }
 
           // Rule 7: Post Dual postOnly limit buy orders (zero starting inventory pair minting)
           const quoteOrders = [

@@ -2,6 +2,8 @@ import dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 dotenv.config();
 
+import fs from "fs";
+import path from "path";
 import { createExchangeClient, PulseQuotingAgent } from "@pulse/core";
 
 async function main() {
@@ -79,6 +81,36 @@ async function main() {
 
       if (summary.auditTxHashes.length > 0) {
         console.log(`  [Somnia Attestation] Tx Hashes: ${summary.auditTxHashes.join(", ")}`);
+      }
+
+      // Persist telemetry for web dashboard consumption
+      try {
+        const telemetryPayload = {
+          isQuotingActive: true,
+          activeMarket: summary.activeMarket,
+          activeMarketSymbol: summary.activeMarket?.symbol || "BTC-15M-UPDOWN",
+          activeModel: summary.activeModel,
+          effectiveSpread: summary.effectiveSpread,
+          totalQuotesPlaced: agent.getTotalQuotesCount(),
+          lastQuoteTimestamp: Date.now(),
+          brierScore: summary.brierScore,
+          unhedgedLegsCount: 0,
+          recentOrders: summary.ordersPlaced.map((o) => ({
+            symbol: o.symbol,
+            outcome: o.outcome,
+            price: o.price,
+            size: o.size,
+            timestamp: Date.now(),
+            txHash: o.txHash,
+          })),
+          predictions: agent.getPredictionHistory(),
+          auditTxHashes: summary.auditTxHashes,
+        };
+
+        const telemetryPath = path.resolve(process.cwd(), ".pulse-telemetry.json");
+        fs.writeFileSync(telemetryPath, JSON.stringify(telemetryPayload, null, 2));
+      } catch (err) {
+        // Fallback gracefully
       }
 
       // Periodically update resolution status of previous predictions
