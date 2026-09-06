@@ -1,0 +1,21 @@
+{
+  "name": "pulse",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "agent-worker"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace=apps/web",
+    "build:web": "npm run build --workspace=apps/web",
+    "agent": "tsx agent-worker/run.ts",
+    "agent:faucet": "tsx agent-worker/faucet-once.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "tsx": "^4.19.0"
+  }
+}
+
