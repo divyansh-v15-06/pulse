@@ -1,0 +1,7 @@
+{
+  "name": "@pulse/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Somnia Shannon on-chain attestation contracts for Pulse"
+}
+
