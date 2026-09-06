@@ -172,6 +172,8 @@ Where:
 * $\sigma$ = Rolling short-window EWMA volatility calculated across recent candles.
 * $\mathcal{N}(\cdot)$ = Standard cumulative normal distribution function.
 
+* **Spot & Strike Pricing Inputs:** Pulse avoids external API lag and third-party dependencies by deriving spot price $S$ and strike $K$ directly from DreamDEX's internal oracle price candles via `fetchPriceCandles` (scoped to `[tradingStart, expiry]`). The opening candle's open price serves as reference strike $K$, and the latest candle's close serves as spot price $S$.
+
 ### 3. Avellaneda-Stoikov Inventory Skewing
 To prevent toxic flow and adverse selection (e.g., holding unhedged directional inventory when a sudden price spike fills only one leg), Pulse dynamically skews its reservation price:
 * If the `UP` leg fills without a corresponding `DOWN` fill, Pulse immediately increases its `DOWN` bid price to attract takers and complete the pair before the 300-second lock window:
@@ -245,9 +247,16 @@ Pulse bridges consumer capital recovery with market-making liquidity via the **A
 
 This transforms retail users from passive speculators into liquidity providers who earn the spread without technical overhead.
 
+* **Single-Wallet Demo Execution:** For the testnet hackathon demo, the user's connected wallet doubles as the quoting agent wallet, enabling instant capital recycling and market-making participation without multi-signature cross-wallet transfers.
+
 ---
 
 ## 8. Setup & Running Locally
+
+### Somnia Gas Tokens (STT)
+Somnia Shannon testnet requires STT tokens for transaction gas (contract deployment and `PulseAudit.sol` on-chain write transactions). Testnet STT can be obtained from:
+* **Official Web Faucet:** [testnet.somnia.network](https://testnet.somnia.network) (connect wallet and verify captcha)
+* **Somnia Discord:** `#dev-chat` channel
 
 ### Prerequisites
 * Node.js `>=18.x`
@@ -272,9 +281,9 @@ cp .env.example .env.local
 NETWORK=testnet
 AGENT_PRIVATE_KEY=0x...          # Funded via exchange.trader.faucet()
 NEXT_PUBLIC_CHAIN_ID=50312       # Somnia Shannon Testnet
-NEXT_PUBLIC_INDEXER_URL=https://stg.api.dreamdex.io/v0
+NEXT_PUBLIC_INDEXER_URL=https://dev.smk.somnia.host/v1/graphql
 NEXT_PUBLIC_RPC_URL=https://dream-rpc.somnia.network
-NEXT_PUBLIC_WS_RPC=wss://dream-rpc.somnia.network/ws
+NEXT_PUBLIC_WS_RPC=wss://api.infra.testnet.somnia.network/ws
 NEXT_PUBLIC_AUDIT_CONTRACT=0x... # Deployed PulseAudit.sol address
 AGENT_HALF_SPREAD=0.02
 AGENT_SIZE_PER_SIDE=5
