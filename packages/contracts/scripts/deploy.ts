@@ -1,9 +1,20 @@
-import dotenv from "dotenv";
-dotenv.config({ path: ".env.local" });
-dotenv.config();
-
 import fs from "fs";
 import path from "path";
+import dotenv from "dotenv";
+
+const envCandidates = [
+  path.resolve(process.cwd(), ".env.local"),
+  path.resolve(process.cwd(), "../../.env.local"),
+  path.resolve(__dirname, "../../../.env.local"),
+  path.resolve(__dirname, "../../.env.local"),
+];
+for (const p of envCandidates) {
+  if (fs.existsSync(p)) {
+    dotenv.config({ path: p });
+  }
+}
+dotenv.config();
+
 import { createWalletClient, createPublicClient, http, defineChain, Hex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
@@ -98,20 +109,25 @@ async function main() {
   console.log("=================================================\n");
 
   // Automatically update .env.local if present
-  const envLocalPath = path.resolve(process.cwd(), ".env.local");
-  if (fs.existsSync(envLocalPath)) {
-    let envContent = fs.readFileSync(envLocalPath, "utf-8");
-    if (envContent.includes("NEXT_PUBLIC_AUDIT_CONTRACT=")) {
-      envContent = envContent.replace(
-        /NEXT_PUBLIC_AUDIT_CONTRACT=.*/,
-        `NEXT_PUBLIC_AUDIT_CONTRACT=${contractAddress}`
-      );
-    } else {
-      envContent += `\nNEXT_PUBLIC_AUDIT_CONTRACT=${contractAddress}\n`;
+  let updatedEnv = false;
+  for (const envLocalPath of envCandidates) {
+    if (fs.existsSync(envLocalPath) && envLocalPath.endsWith(".env.local")) {
+      let envContent = fs.readFileSync(envLocalPath, "utf-8");
+      if (envContent.includes("NEXT_PUBLIC_AUDIT_CONTRACT=")) {
+        envContent = envContent.replace(
+          /NEXT_PUBLIC_AUDIT_CONTRACT=.*/,
+          `NEXT_PUBLIC_AUDIT_CONTRACT=${contractAddress}`
+        );
+      } else {
+        envContent += `\nNEXT_PUBLIC_AUDIT_CONTRACT=${contractAddress}\n`;
+      }
+      fs.writeFileSync(envLocalPath, envContent);
+      console.log(`[Config] Automatically updated NEXT_PUBLIC_AUDIT_CONTRACT in ${envLocalPath}!`);
+      updatedEnv = true;
+      break;
     }
-    fs.writeFileSync(envLocalPath, envContent);
-    console.log(`[Config] Automatically updated NEXT_PUBLIC_AUDIT_CONTRACT in .env.local!`);
-  } else {
+  }
+  if (!updatedEnv) {
     console.log(`Add this to your .env.local:\nNEXT_PUBLIC_AUDIT_CONTRACT=${contractAddress}`);
   }
 }
