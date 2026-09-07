@@ -72,19 +72,38 @@ export function ClaimRow({ position, isSelected, onToggle }: ClaimRowProps) {
       </td>
 
       <td className="py-4 px-4 text-center">
-        {position.oracleAuditUrl ? (
-          <a
-            href={position.oracleAuditUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors underline-offset-4 hover:underline"
-            title="View cryptographic proof on Somnia Oracle visualizer"
-          >
-            Verify <ExternalLink className="w-3 h-3" />
-          </a>
-        ) : (
-          <span className="text-xs text-slate-600">On-Chain</span>
-        )}
+        <div className="flex flex-col items-center gap-1.5">
+          {position.contractUrl && (
+            <>
+              <a
+                href={`${position.contractUrl}?tab=logs`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors underline-offset-4 hover:underline font-medium"
+                title="View on-chain oracle settlement event (Logs) on Somnia Explorer"
+              >
+                Resolution Proof <ExternalLink className="w-3 h-3" />
+              </a>
+              <a
+                href={position.contractUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-[11px] text-slate-400 hover:text-slate-300 transition-colors underline-offset-4 hover:underline"
+                title="View BinaryMarket smart contract on Somnia Shannon Explorer"
+              >
+                Contract <ExternalLink className="w-2.5 h-2.5" />
+              </a>
+            </>
+          )}
+          {position.oracleQuestionId && (
+            <span
+              className="text-[10px] text-slate-500 font-mono"
+              title={`Prophecy Oracle Question ID: ${position.oracleQuestionId}`}
+            >
+              Oracle #{position.oracleQuestionId.slice(0, 6)}...
+            </span>
+          )}
+        </div>
       </td>
     </tr>
   );

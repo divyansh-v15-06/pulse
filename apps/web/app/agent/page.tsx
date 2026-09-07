@@ -10,6 +10,7 @@ export default function AgentPage() {
   const [telemetry, setTelemetry] = useState<any>(null);
   const [history, setHistory] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAllProofs, setShowAllProofs] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -163,81 +164,104 @@ export default function AgentPage() {
       </div>
 
       {/* Decision Attestation Log */}
-      <div className="bg-[#080d1e] border border-slate-800 rounded-xl overflow-hidden shadow-lg">
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-blue-400" />
-            <h3 className="font-bold text-slate-100 text-sm">
-              Cryptographic Decision Proofs (Somnia Shannon L1)
-            </h3>
-          </div>
-          <span className="text-xs text-slate-500 font-mono">
-            PulseAudit.sol on-chain hash chain
-          </span>
-        </div>
+      {(() => {
+        const allPredictions = [...(history?.predictions || [])].reverse();
+        const INITIAL_LIMIT = 8;
+        const displayedPredictions = showAllProofs
+          ? allPredictions
+          : allPredictions.slice(0, INITIAL_LIMIT);
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="text-[11px] uppercase tracking-wider text-slate-500 bg-slate-900/60 border-b border-slate-850 font-mono">
-              <tr>
-                <th className="py-3 px-4">Market Window</th>
-                <th className="py-3 px-4">Forecast P(Up)</th>
-                <th className="py-3 px-4">Brier Score</th>
-                <th className="py-3 px-4">Realized Outcome</th>
-                <th className="py-3 px-4 text-right">L1 Proof Hash</th>
-              </tr>
-            </thead>
-            <tbody className="font-mono text-xs">
-              {(history?.predictions || []).map((p: any, idx: number) => {
-                const date = new Date(p.quotedAt).toLocaleTimeString();
-                return (
-                  <tr key={idx} className="border-b border-slate-850 hover:bg-slate-900/40">
-                    <td className="py-3 px-4 text-slate-300">
-                      {p.asset} ({date})
-                    </td>
-                    <td className="py-3 px-4 text-blue-400 font-bold">
-                      {(p.predictedProbUp * 100).toFixed(1)}%
-                    </td>
-                    <td className="py-3 px-4 text-emerald-400">
-                      {brierScore.toFixed(4)}
-                    </td>
-                    <td className="py-3 px-4">
-                      {p.actualOutcome === undefined ? (
-                        <span className="text-slate-500">Live / Open</span>
-                      ) : p.actualOutcome === 1 ? (
-                        <span className="text-emerald-400">UP WON (1.0)</span>
-                      ) : (
-                        <span className="text-amber-400">DOWN WON (0.0)</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      {p.txHash ? (
-                        <a
-                          href={`https://shannon-explorer.somnia.network/tx/${p.txHash}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1 font-bold"
-                        >
-                          {p.txHash.slice(0, 8)}...{p.txHash.slice(-6)} <ExternalLink className="w-3 h-3" />
-                        </a>
-                      ) : (
-                        <a
-                          href="https://shannon-explorer.somnia.network"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-slate-500 hover:text-blue-400 inline-flex items-center gap-1"
-                        >
-                          0x{p.marketId.slice(2, 10)}... <ExternalLink className="w-3 h-3" />
-                        </a>
-                      )}
-                    </td>
+        return (
+          <div className="bg-[#080d1e] border border-slate-800 rounded-xl overflow-hidden shadow-lg">
+            <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-blue-400" />
+                <h3 className="font-bold text-slate-100 text-sm">
+                  Cryptographic Decision Proofs (Somnia Shannon L1)
+                </h3>
+              </div>
+              <span className="text-xs text-slate-400 font-mono">
+                Showing {displayedPredictions.length} of {allPredictions.length} proofs (PulseAudit.sol)
+              </span>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="text-[11px] uppercase tracking-wider text-slate-500 bg-slate-900/60 border-b border-slate-850 font-mono">
+                  <tr>
+                    <th className="py-3 px-4">Market Window</th>
+                    <th className="py-3 px-4">Forecast P(Up)</th>
+                    <th className="py-3 px-4">Brier Score</th>
+                    <th className="py-3 px-4">Realized Outcome</th>
+                    <th className="py-3 px-4 text-right">L1 Proof Hash</th>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                </thead>
+                <tbody className="font-mono text-xs">
+                  {displayedPredictions.map((p: any, idx: number) => {
+                    const date = new Date(p.quotedAt).toLocaleTimeString();
+                    return (
+                      <tr key={idx} className="border-b border-slate-850 hover:bg-slate-900/40">
+                        <td className="py-3 px-4 text-slate-300">
+                          {p.asset} ({date})
+                        </td>
+                        <td className="py-3 px-4 text-blue-400 font-bold">
+                          {(p.predictedProbUp * 100).toFixed(1)}%
+                        </td>
+                        <td className="py-3 px-4 text-emerald-400">
+                          {brierScore.toFixed(4)}
+                        </td>
+                        <td className="py-3 px-4">
+                          {p.actualOutcome === undefined ? (
+                            <span className="text-slate-500">Live / Open</span>
+                          ) : p.actualOutcome === 1 ? (
+                            <span className="text-emerald-400">UP WON (1.0)</span>
+                          ) : (
+                            <span className="text-amber-400">DOWN WON (0.0)</span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          {p.txHash ? (
+                            <a
+                              href={`https://shannon-explorer.somnia.network/tx/${p.txHash}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1 font-bold"
+                            >
+                              {p.txHash.slice(0, 8)}...{p.txHash.slice(-6)} <ExternalLink className="w-3 h-3" />
+                            </a>
+                          ) : (
+                            <a
+                              href="https://shannon-explorer.somnia.network"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-slate-500 hover:text-blue-400 inline-flex items-center gap-1"
+                            >
+                              0x{p.marketId.slice(2, 10)}... <ExternalLink className="w-3 h-3" />
+                            </a>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {allPredictions.length > INITIAL_LIMIT && (
+              <div className="p-3 border-t border-slate-800 bg-slate-900/40 text-center">
+                <button
+                  onClick={() => setShowAllProofs(!showAllProofs)}
+                  className="text-xs font-mono font-semibold text-blue-400 hover:text-blue-300 transition-colors px-4 py-1.5 rounded-lg border border-blue-900/60 bg-blue-950/30 hover:bg-blue-900/40"
+                >
+                  {showAllProofs
+                    ? "Show Recent Only (8) ↑"
+                    : `Show All Decision Proofs (${allPredictions.length} Total) ↓`}
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }
