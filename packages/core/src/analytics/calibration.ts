@@ -5,6 +5,7 @@ export interface PredictionRecord {
   quotedAt: number;        // timestamp in ms
   resolvedAt?: number;     // timestamp in ms
   actualOutcome?: number;  // 1 if Up won, 0 if Down won, 0.5 if voided
+  txHash?: string;         // On-chain Somnia Shannon attestation hash
 }
 
 export interface CalibrationBucket {
