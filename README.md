@@ -1,5 +1,7 @@
 # Pulse — Closed-Loop Liquidity & Capital Recycling Protocol
 
+**Live Application:** [pulse-iota-one-81.vercel.app](https://pulse-iota-one-81.vercel.app)  
+**PulseAudit Smart Contract (Somnia Shannon):** [`0xba2b8f1b8f7a4a361e0fdf98410929a55b9e2264`](https://shannon-explorer.somnia.network/address/0xba2b8f1b8f7a4a361e0fdf98410929a55b9e2264)  
 **Target:** Somnia × DreamDEX Event Contracts Hackathon (DoraHacks, Testnet Submission)  
 **Track:** Open Track (DeFi / Event Contracts / Prediction Markets / Autonomous Agents)  
 **Ecosystem Primitives:** Somnia Shannon Layer-1 (105k TPS, Sub-second Finality) × DreamDEX Event Contracts  
@@ -284,7 +286,7 @@ NEXT_PUBLIC_CHAIN_ID=50312       # Somnia Shannon Testnet
 NEXT_PUBLIC_INDEXER_URL=https://dev.smk.somnia.host/v1/graphql
 NEXT_PUBLIC_RPC_URL=https://dream-rpc.somnia.network
 NEXT_PUBLIC_WS_RPC=wss://api.infra.testnet.somnia.network/ws
-NEXT_PUBLIC_AUDIT_CONTRACT=0x... # Deployed PulseAudit.sol address
+NEXT_PUBLIC_AUDIT_CONTRACT=0xba2b8f1b8f7a4a361e0fdf98410929a55b9e2264 # Deployed PulseAudit.sol address
 AGENT_HALF_SPREAD=0.02
 AGENT_SIZE_PER_SIDE=5
 AGENT_INTERVAL_MS=15000
