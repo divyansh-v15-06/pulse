@@ -11,7 +11,7 @@
 
 <br />
 
-**[🌐 Launch Web Terminal](https://pulse-iota-one-81.vercel.app)** • **[📡 Claims Radar](https://pulse-iota-one-81.vercel.app/claims)** • **[📈 Quoting & Calibration](https://pulse-iota-one-81.vercel.app/agent)** • **[📜 Verified Contract](https://shannon-explorer.somnia.network/address/0xba2b8f1b8f7a4a361e0fdf98410929a55b9e2264)** • **[🎥 Video Demo Script](video-script.md)**
+**[🌐 Launch Web Terminal](https://pulse-iota-one-81.vercel.app)** • **[📡 Claims Radar](https://pulse-iota-one-81.vercel.app/claims)** • **[📈 Quoting & Calibration](https://pulse-iota-one-81.vercel.app/agent)** • **[📜 Verified Contract](https://shannon-explorer.somnia.network/address/0xba2b8f1b8f7a4a361e0fdf98410929a55b9e2264)**
 
 <br />
 
@@ -323,7 +323,6 @@ pulse/
 │   ├── run.ts                       # Long-lived market-making process
 │   └── faucet-once.ts               # One-time testnet bootstrap script
 ├── .pulse-telemetry.json            # High-throughput local telemetry store
-├── video-script.md                  # 2.5-minute official hackathon video demo flow
 └── package.json                     # Root monorepo configuration
 ```
 
@@ -382,7 +381,6 @@ npm run agent
 * **GitHub Repository:** [https://github.com/divyansh-v15-06/pulse](https://github.com/divyansh-v15-06/pulse)
 * **Live Production URL:** [https://pulse-iota-one-81.vercel.app](https://pulse-iota-one-81.vercel.app)
 * **Smart Contract on Somnia Shannon:** [`0xba2b8f1b8f7a4a361e0fdf98410929a55b9e2264`](https://shannon-explorer.somnia.network/address/0xba2b8f1b8f7a4a361e0fdf98410929a55b9e2264)
-* **Video Recording Guide:** Refer to [`video-script.md`](video-script.md) for the exact 2.5-minute demonstration flow.
 
 ---
 
