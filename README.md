@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="./pulse-logo.jpg" alt="Pulse Protocol Logo" width="160" height="160" style="border-radius: 50%; box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);" />
+
 # ⚡ PULSE
 ### Closed-Loop Liquidity & Capital Recycling Protocol for DreamDEX Event Contracts
 
